@@ -2,6 +2,7 @@ package main
 
 import (
     "log"
+    "runtime"
     "net/http"
     "database/sql"
     "route"
@@ -9,6 +10,8 @@ import (
 )
 
 func init() {
+    runtime.GOMAXPROCS(runtime.NumCPU())
+
 	var err error
 	db_handler.Db, err = sql.Open("mysql", "root:root@tcp(127.0.0.1:3306)/piara")
 	if err != nil {
