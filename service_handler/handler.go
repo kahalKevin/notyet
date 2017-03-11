@@ -84,3 +84,26 @@ func PostComment(w http.ResponseWriter, r *http.Request) {
     w.WriteHeader(http.StatusOK)
 }
 
+func LikeComment(w http.ResponseWriter, r *http.Request) {
+    var comment db_handler.Comment
+    body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
+    if err != nil {
+        panic(err)
+    }
+    if err := r.Body.Close(); err != nil {
+        panic(err)
+    }
+    if err := json.Unmarshal(body, &comment); err != nil {
+        w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+        w.WriteHeader(422) // unprocessable entity
+        if err := json.NewEncoder(w).Encode(err); err != nil {
+            panic(err)
+        }
+    }
+    //do concurrently
+    if(db_handler.CheckCommentExist(strconv.Itoa(comment.Id))){
+        go db_handler.IncrementLike(strconv.Itoa(comment.Id))
+    }
+    w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+    w.WriteHeader(http.StatusOK)
+}

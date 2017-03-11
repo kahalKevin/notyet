@@ -47,4 +47,10 @@ var routes = Routes{
         "/makepost",
         service_handler.PostCreate,
     },
+    Route{
+        "LikeComment",
+        "POST",
+        "/likecomment",
+        service_handler.LikeComment,
+    },
 }

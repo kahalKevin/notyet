@@ -48,6 +48,20 @@ func CreateComment(comment Comment) {
 	}
 }
 
+func IncrementLike(commentid string) {
+	err := Db.Ping()
+	if err != nil {
+		return
+	}
+	query_update_like_count := "update comments set like_count=like_count+1 where id ="+commentid
+	log.Printf(query_update_like_count)
+
+	_, err = Db.Exec(query_update_like_count)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func GetPost() Posts{
 	err := Db.Ping()
 	if err != nil {
@@ -79,11 +93,39 @@ func CheckPostExist(postid string) bool{
 	}
 
 	post_exist := false
-	err = Db.QueryRow("select exists(select idposts from piara.posts where idposts = "+ postid +" limit 1) as 'exist'").Scan(&post_exist)
+	err = Db.QueryRow("select exists(select idposts from posts where idposts = "+ postid +" limit 1) as 'exist'").Scan(&post_exist)
 	if err != nil {
 		log.Fatal(err)
 	}
 	return post_exist
+}
+
+func CheckCommentExist(commentid string) bool{
+	err := Db.Ping()
+	if err != nil {
+		return false
+	}
+
+	comment_exist := false
+	err = Db.QueryRow("select exists(select id from comments where id = "+ commentid +" limit 1) as 'exist'").Scan(&comment_exist)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return comment_exist
+}
+
+func GetCurrentCommentLike(commentid string) int{
+	err := Db.Ping()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	like_count := 0
+	err = Db.QueryRow("select like_count from comments where id = "+ commentid +"").Scan(&like_count)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return like_count
 }
 
 func GetComment(postid string) Comments{	

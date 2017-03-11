@@ -19,7 +19,7 @@ type Post struct {
 type Posts []Post
 
 type Comment struct {
-	Id     		int       
+	Id     		int    `json:"comment_id"`
     Post_id     int    `json:"post_id"`
     Comment     string `json:"comment"`
     Like_count  int	   
