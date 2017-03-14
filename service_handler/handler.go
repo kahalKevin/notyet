@@ -62,8 +62,6 @@ func PostCreate(w http.ResponseWriter, r *http.Request) {
     // go db_handler.CreatePost(post)
 
     job := Job{JobType:RequestPost , Data:body}
-
-    // Push the job onto the queue.
     WorkQueue <- job
 
     w.Header().Set("Content-Type", "application/json; charset=UTF-8")
@@ -86,9 +84,11 @@ func PostComment(w http.ResponseWriter, r *http.Request) {
             panic(err)
         }
     }
-    //do concurrently
     if(db_handler.CheckPostExist(strconv.Itoa(comment.Post_id))){
-        go db_handler.CreateComment(comment)
+        //do concurrently
+        // go db_handler.CreateComment(comment)
+        job := Job{JobType:RequestComment, Data:body}
+        WorkQueue <- job
     }
     w.Header().Set("Content-Type", "application/json; charset=UTF-8")
     w.WriteHeader(http.StatusOK)
@@ -110,9 +110,11 @@ func LikeComment(w http.ResponseWriter, r *http.Request) {
             panic(err)
         }
     }
-    //do concurrently
     if(db_handler.CheckCommentExist(strconv.Itoa(comment.Id))){
-        go db_handler.IncrementLike(strconv.Itoa(comment.Id))
+        //do concurrently
+        // go db_handler.IncrementLike(strconv.Itoa(comment.Id))
+        job := Job{JobType:RequestLike, Data:body}
+        WorkQueue <- job
     }
     w.Header().Set("Content-Type", "application/json; charset=UTF-8")
     w.WriteHeader(http.StatusOK)
