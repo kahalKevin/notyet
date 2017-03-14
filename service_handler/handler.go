@@ -11,6 +11,9 @@ import (
     "db_handler"
 )
 
+// A buffered channel that we can send work requests on.
+var WorkQueue = make(chan Job)
+
 func Index(w http.ResponseWriter, r *http.Request) {
     fmt.Fprintln(w, "Welcome to notyet!")
 }
@@ -54,8 +57,15 @@ func PostCreate(w http.ResponseWriter, r *http.Request) {
             panic(err)
         }
     }
+
     //do concurrently
-    go db_handler.CreatePost(post)
+    // go db_handler.CreatePost(post)
+
+    job := Job{JobType:RequestPost , Data:body}
+
+    // Push the job onto the queue.
+    WorkQueue <- job
+
     w.Header().Set("Content-Type", "application/json; charset=UTF-8")
     w.WriteHeader(http.StatusOK)
 }

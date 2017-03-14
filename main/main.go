@@ -1,12 +1,19 @@
 package main
 
 import (
+    "fmt"
     "log"
+    "flag"
     "runtime"
     "net/http"
     "database/sql"
     "route"
     "db_handler"
+    "service_handler"
+)
+
+var(
+    nwork = flag.Int("worker", 20, "number of worker")
 )
 
 func init() {
@@ -20,6 +27,9 @@ func init() {
 }
 
 func main() {
+    flag.Parse()
+    fmt.Println("Starting the dispatcher")
+    service_handler.StartDispatcher(*nwork)
 
     router := route.NewRouter()
 
